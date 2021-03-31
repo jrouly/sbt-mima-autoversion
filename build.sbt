@@ -16,3 +16,13 @@ pluginCrossBuild / sbtVersion := {
     case "2.12" => "1.1.6" // https://github.com/sbt/sbt/issues/5049
   }
 }
+
+// Dependencies
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.8.1+78-92bcbd62")
+addSbtPlugin("com.github.sbt" % "sbt-release" % "1.0.15")
+addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
+
+libraryDependencies += "com.vdurmont" % "semver4j" % "3.1.0"
+libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.15.3" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.6" % "test"
+libraryDependencies += "org.scalatestplus" %% "scalacheck-1-15" % "3.2.6.0" % "test"
