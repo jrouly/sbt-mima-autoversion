@@ -16,5 +16,3 @@ pluginCrossBuild / sbtVersion := {
     case "2.12" => "1.1.6" // https://github.com/sbt/sbt/issues/5049
   }
 }
-
-
