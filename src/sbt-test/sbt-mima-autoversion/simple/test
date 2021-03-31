@@ -1,0 +1,14 @@
+# Generate project files.
+> reload
+> compile
+
+# Setup repository.
+$ exec git init
+$ exec git add .
+$ exec git commit -m 'initial commit'
+$ exec git tag v0.0.0
+
+# Prove sbt can start.
+> reload
+> compile
+> show version
