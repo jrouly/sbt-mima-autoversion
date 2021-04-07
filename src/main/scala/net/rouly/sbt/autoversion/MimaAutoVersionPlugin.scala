@@ -58,10 +58,11 @@ object MimaAutoVersionPlugin extends AutoPlugin {
     }
 
     if (bumps.nonEmpty) bumps.max
-    else default match {
-      case None => sys.error("Unable to automatically determine an appropriate version bump.")
-      case Some(bump) => bump
-    }
+    else
+      default match {
+        case None => sys.error("Unable to automatically determine an appropriate version bump.")
+        case Some(bump) => bump
+      }
   }
 
   private def runGit(args: String*): Def.Initialize[Task[Array[String]]] = Def.task {
