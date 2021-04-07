@@ -14,8 +14,8 @@ trait Keys {
   val mimaAutoVersionSuggestedBump =
     taskKey[Bump]("Version bump computed by sbt-mima-autoversion.")
 
-  val mimaAutoVersionAttemptBumps =
-    taskKey[Seq[Bump]]("Ordered list of version bumps to attempt.")
+  val mimaAutoVersionDefaultBump =
+    settingKey[Option[Bump]]("Default version bump if sbt-mima-autoversion is unable to suggest one.")
 }
 
 object Keys extends Keys

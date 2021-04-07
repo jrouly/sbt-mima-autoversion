@@ -1,6 +1,14 @@
 import ReleaseTransformations._
 
-// Default sbt-release process, minus publication (for testing).
+isSnapshot := true
+
+// Satisfy the publishArtifacts precondition.
+publishTo := Some(Resolver.url("dummy"))
+
+// Only publish artifacts locally for testing.
+releasePublishArtifactsAction := publishLocal.value
+
+// Default sbt-release process, minus git push.
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
@@ -9,7 +17,7 @@ releaseProcess := Seq[ReleaseStep](
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
-  // publishArtifacts,
+  publishArtifacts,
   setNextVersion,
   commitNextVersion
   // pushChanges

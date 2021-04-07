@@ -1,14 +1,49 @@
-# Generate project files.
-> reload
-> compile
-
-# Setup repository.
+# Set up repository.
+$ exec cp scenarios/v1 src/main/scala/Foo.scala
 $ exec git init
 $ exec git add .
 $ exec git commit -m 'initial commit'
 $ exec git tag v0.0.0
 
-# Prove sbt can start.
+# Release version 0.0.0.
+> publishLocal
+
+# Change method value. Expect patch version bump.
+# 0.0.0 => 0.0.1 => 0.0.2-SNAPSHOT
+$ exec cp scenarios/v2 src/main/scala/Foo.scala
+$ exec git commit -am 'v1 => v2'
 > reload
-> compile
-> show version
+> release with-defaults
+$ exec grep -Fq '"0.0.2-SNAPSHOT"' version.sbt
+
+# Add new method. Expect minor version bump.
+# 0.0.2-SNAPSHOT => 0.1.0 => 0.1.1-SNAPSHOT
+$ exec cp scenarios/v3 src/main/scala/Foo.scala
+$ exec git commit -am 'v2 => v3'
+> reload
+> release with-defaults
+$ exec grep -Fq '"0.1.1-SNAPSHOT"' version.sbt
+
+# Add new method. Expect minor version bump.
+# 0.1.1-SNAPSHOT => 0.2.0 => 0.2.1-SNAPSHOT
+$ exec cp scenarios/v4 src/main/scala/Foo.scala
+$ exec git commit -am 'v3 => v4'
+> reload
+> release with-defaults
+$ exec grep -Fq '"0.2.1-SNAPSHOT"' version.sbt
+
+# Delete existing methods. Expect major version bump.
+# 0.2.1-SNAPSHOT => 1.0.0 => 1.0.1-SNAPSHOT
+$ exec cp scenarios/v5 src/main/scala/Foo.scala
+$ exec git commit -am 'v4 => v5'
+> reload
+> release with-defaults
+$ exec grep -Fq '"1.0.1-SNAPSHOT"' version.sbt
+
+# Change existing method return type. Expect major version bump.
+# 1.0.1-SNAPSHOT => 2.0.0 => 2.0.1-SNAPSHOT
+$ exec cp scenarios/v6 src/main/scala/Foo.scala
+$ exec git commit -am 'v5 => v6'
+> reload
+> release with-defaults
+$ exec grep -Fq '"2.0.1-SNAPSHOT"' version.sbt

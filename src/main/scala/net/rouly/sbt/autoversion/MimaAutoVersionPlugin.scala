@@ -5,7 +5,7 @@ import com.typesafe.tools.mima.plugin.MimaKeys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import com.vdurmont.semver4j.Semver
 import com.vdurmont.semver4j.Semver.SemverType
-import net.rouly.sbt.autoversion.model.Tag
+import net.rouly.sbt.autoversion.model.{Tag, bumpOrdering}
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
@@ -28,9 +28,10 @@ object MimaAutoVersionPlugin extends AutoPlugin {
     mimaAutoVersionLatestTag := findLatestTag.value,
     mimaAutoVersionTagNameCleaner := { _.stripPrefix("v") },
     mimaAutoVersionSuggestedBump := suggestBump.value,
-    mimaAutoVersionAttemptBumps := Vector(Bump.Bugfix, Bump.Minor, Bump.Major),
+    mimaAutoVersionDefaultBump := Some(Bump.Bugfix),
     releaseVersion := MimaAutoVersion.setReleaseVersion(mimaAutoVersionSuggestedBump.value),
-    mimaPreviousArtifacts := previousTaggedArtifact.value
+    mimaPreviousArtifacts := previousTaggedArtifact.value,
+    mimaCheckDirection := "both"
   )
 
   private lazy val findLatestTag = Def.task {
@@ -42,13 +43,25 @@ object MimaAutoVersionPlugin extends AutoPlugin {
 
   // The current project module ID, but at the latest tagged version.
   private lazy val previousTaggedArtifact = Def.task {
-    val moduleId = projectID.value
     val latestVersion = mimaAutoVersionLatestTag.value.map(_.version.toString)
-    Set(latestVersion.map(moduleId.withRevision)).flatten
+    // TODO: Using projectID doesn't work with explicit Artifacts.
+    val moduleId = latestVersion.map { version => organization.value %% name.value % version }
+    Set(moduleId).flatten
   }
 
   private lazy val suggestBump = Def.task {
-    Bump.default // TODO
+    val default = mimaAutoVersionDefaultBump.value
+    val bumps: Iterable[Bump] = mimaFindBinaryIssues.value.values.map {
+      case (_ :: _, _) => Bump.Major
+      case (Nil, _ :: _) => Bump.Minor
+      case (Nil, Nil) => Bump.Bugfix
+    }
+
+    if (bumps.nonEmpty) bumps.max
+    else default match {
+      case None => sys.error("Unable to automatically determine an appropriate version bump.")
+      case Some(bump) => bump
+    }
   }
 
   private def runGit(args: String*): Def.Initialize[Task[Array[String]]] = Def.task {
