@@ -1,6 +1,7 @@
 # Set up repository.
-$ exec cp scenarios/v1 src/main/scala/Foo.scala
 $ exec git init
+$ exec git config user.email "noreply@github.com"
+$ exec git config user.name "ci robot"
 $ exec git add .
 $ exec git commit -m 'initial commit'
 $ exec git tag v0.0.0
