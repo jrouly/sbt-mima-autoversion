@@ -1,0 +1,5 @@
+class Foo {
+  def foo = 3
+  def bar = foo
+  def fooBar = bar
+}
