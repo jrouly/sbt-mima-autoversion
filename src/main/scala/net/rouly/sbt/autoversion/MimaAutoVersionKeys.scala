@@ -4,9 +4,9 @@ import net.rouly.sbt.autoversion.model.Tag
 import sbt._
 import sbtrelease.Version.Bump
 
-trait Keys {
+trait MimaAutoVersionKeys {
   val mimaAutoVersionLatestTag =
-    taskKey[Option[Tag]]("Latest semver version from Git tags.")
+    settingKey[Option[Tag]]("Latest semver version from Git tags.")
 
   val mimaAutoVersionTagNameCleaner =
     settingKey[String => String]("Cleans the git tag to extract only the version.")
@@ -20,4 +20,4 @@ trait Keys {
     )
 }
 
-object Keys extends Keys
+object MimaAutoVersionKeys extends MimaAutoVersionKeys

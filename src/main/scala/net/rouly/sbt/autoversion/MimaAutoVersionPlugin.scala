@@ -1,6 +1,7 @@
 package net.rouly.sbt.autoversion
 
-import com.typesafe.sbt.{GitPlugin, SbtGit}
+import com.typesafe.sbt.GitPlugin
+import com.typesafe.sbt.git.ConsoleGitRunner
 import com.typesafe.tools.mima.plugin.MimaKeys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import com.vdurmont.semver4j.Semver
@@ -21,7 +22,7 @@ object MimaAutoVersionPlugin extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
-  object autoImport extends Keys
+  object autoImport extends MimaAutoVersionKeys
   import autoImport._
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
@@ -34,7 +35,7 @@ object MimaAutoVersionPlugin extends AutoPlugin {
     mimaCheckDirection := "both"
   )
 
-  private lazy val findLatestTag = Def.task {
+  private lazy val findLatestTag = Def.setting {
     val gitTags = runGit("tag", "--list").value
     val clean = mimaAutoVersionTagNameCleaner.value
     val versions = gitTags.map(tag => Tag(tag, new Semver(clean(tag), SemverType.LOOSE)))
@@ -42,7 +43,7 @@ object MimaAutoVersionPlugin extends AutoPlugin {
   }
 
   // The current project module ID, but at the latest tagged version.
-  private lazy val previousTaggedArtifact = Def.task {
+  private lazy val previousTaggedArtifact = Def.setting {
     val latestVersion = mimaAutoVersionLatestTag.value.map(_.version.toString)
     // TODO: Using projectID doesn't work with explicit Artifacts.
     val moduleId = latestVersion.map { version => organization.value %% name.value % version }
@@ -65,9 +66,8 @@ object MimaAutoVersionPlugin extends AutoPlugin {
       }
   }
 
-  private def runGit(args: String*): Def.Initialize[Task[Array[String]]] = Def.task {
-    SbtGit.GitKeys.gitRunner
-      .value(args: _*)(file("."), Logger.Null)
+  private def runGit(args: String*): Def.Initialize[Array[String]] = Def.setting {
+    ConsoleGitRunner(args: _*)(file("."), Logger.Null)
       .split(Properties.lineSeparator)
       .filter(_.trim.nonEmpty)
   }

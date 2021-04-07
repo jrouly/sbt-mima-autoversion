@@ -18,7 +18,7 @@ pluginCrossBuild / sbtVersion := {
 }
 
 // Dependencies
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.8.1+78-92bcbd62")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.8.1")
 addSbtPlugin("com.github.sbt" % "sbt-release" % "1.0.15")
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
 
